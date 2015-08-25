@@ -25,7 +25,6 @@ define([
             game.gameID = gameID;
             return ready();
         });
-
     };
 
     return NetworkManager;

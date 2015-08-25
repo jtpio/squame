@@ -19,9 +19,17 @@ requirejs([
     }
 
     function create () {
+        game.stage.disableVisibilityChange = true;
         game.stage.backgroundColor = '#000000';
 
-        networkManager.getClient().send('rotate', 90);
+        game.input.onDown.add(function () {
+            networkManager.getClient().send('move');
+        });
+
+        game.input.onUp.add(function () {
+            networkManager.getClient().send('stop');
+        });
+
     }
 
 });
