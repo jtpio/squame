@@ -32,7 +32,7 @@ define([
     }
 
     function easingFun(t) {
-        return Math.abs(Math.cos(t));
+        return Math.abs(Math.sin(t));
     }
 
     function move (moved) {

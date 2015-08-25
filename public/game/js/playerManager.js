@@ -29,14 +29,12 @@ define([
     PlayerManager.prototype.setupPlayer = function (done) {
 
         player.on('move', function () {
-            console.log('move');
             if (events.move) {
                 events.move();
             }
         });
 
         player.on('stop', function () {
-            console.log('stop');
             if (events.stop) {
                 events.stop();
             }
