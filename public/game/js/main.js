@@ -2,13 +2,15 @@
 
 requirejs([
     './playerManager',
-    './networkManager'
-], function (PlayerManager, NetworkManager) {
+    './networkManager',
+    './colors'
+], function (PlayerManager, NetworkManager, Colors) {
 
     var W = window.innerWidth;
     var H = window.innerHeight;
     var graphics;
 
+    var colorScheme = new Colors();
     var game;
     var playerManager;
     var networkManager;
@@ -18,10 +20,7 @@ requirejs([
     var sites = [];
     var bbox = {xl: 0, xr: W, yt: 0, yb: H};
 
-    var colors = [];
-    for (var i = 0; i < 1000; i++) {
-        colors.push(Phaser.Color.getRandomColor());
-    }
+    var colors = colorScheme.getPalette(0);
 
     function genXY(id) {
         return {
@@ -84,7 +83,7 @@ requirejs([
             var len = halfedges.length;
             var v = halfedges[0].getStartpoint();
             graphics.lineStyle(1, 0x000000, 0.1);
-            graphics.beginFill(colors[site.voronoiId]);
+            graphics.beginFill(colors[site.voronoiId % colors.length]);
     		graphics.moveTo(v.x,v.y);
     		for (var i = 0; i < len; i++) {
     			v = halfedges[i].getEndpoint();
