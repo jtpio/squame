@@ -119,6 +119,7 @@ define([
     Level.prototype.init = function (lvl) {
         curr = lvl || 1;
         playerManager.clearPlayer();
+        game.world.alpha = 1;
     };
 
     Level.prototype.update = function () {

@@ -35,14 +35,20 @@ requirejs([
 
         game.state.add('Level', level);
 
-
-        playerManager.on('first', function () {
-            game.state.start('Level');
-        });
+        playerManager.on('first', transition);
 
         networkManager.setupServer(function (gameID) {
             url.text = buildURL(gameID);
         });
+    }
+
+    function transition() {
+        console.log('dslfjdsfk');
+        var tween = game.add.tween(game.world).to({ alpha: 0 }, 500, 'Linear', true);
+        tween.onComplete.add(function () {
+            console.log('DONE');
+            game.state.start('Level');
+        }, tween);
     }
 
     game = new Phaser.Game(W, H, Phaser.WEBGL, 'game-container', {
