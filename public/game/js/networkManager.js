@@ -16,14 +16,15 @@ define([
     NetworkManager.prototype.setupServer = function (ready) {
         server = new GameServer('server');
 
-        server.on('newPlayer', function (player) {
-            playerManager.add(player);
-        });
-
         server.on('gameID', function (gameID) {
             console.log('ready', gameID);
             game.gameID = gameID;
-            return ready();
+
+            server.on('newPlayer', function (player) {
+                playerManager.add(player);
+            });
+
+            return ready(gameID);
         });
     };
 
