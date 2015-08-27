@@ -4,11 +4,13 @@ requirejs([
     './playerManager',
     './networkManager',
     './level',
-], function (PlayerManager, NetworkManager, Level) {
+    './vfx'
+], function (PlayerManager, NetworkManager, Level, Vfx) {
 
     var W = 1024;
     var H = 576;
     var game;
+    var vfx;
 
     var url;
     var urlStyle = { font: '35px Arial', fill: '#ffffff', align: 'center' };
@@ -29,9 +31,11 @@ requirejs([
         game.time.advancedTiming = true;
         game.stage.disableVisibilityChange = true;
 
+        vfx = new Vfx(game);
+
         var playerManager = new PlayerManager(game);
         var networkManager = new NetworkManager(game, playerManager);
-        var level = new Level(game, playerManager);
+        var level = new Level(game, playerManager, vfx);
 
         game.state.add('Level', level);
 
@@ -43,12 +47,9 @@ requirejs([
     }
 
     function transition() {
-        console.log('dslfjdsfk');
-        var tween = game.add.tween(game.world).to({ alpha: 0 }, 500, 'Linear', true);
-        tween.onComplete.add(function () {
-            console.log('DONE');
+        vfx.gameFadeOut(function () {
             game.state.start('Level');
-        }, tween);
+        });
     }
 
     game = new Phaser.Game(W, H, Phaser.WEBGL, 'game-container', {

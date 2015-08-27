@@ -29,6 +29,7 @@ define([
     };
 
     PlayerManager.prototype.setupPlayer = function (done) {
+        player.off();
         player.on('move', function () {
             if (events.move) {
                 events.move();
@@ -49,6 +50,14 @@ define([
 
     PlayerManager.prototype.on = function (event, cb) {
         events[event] = cb;
+    };
+
+    PlayerManager.prototype.off = function (event) {
+        if (event) {
+            delete events[event];
+        } else {
+            events = {};
+        }
     };
 
     return PlayerManager;

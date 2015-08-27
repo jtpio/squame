@@ -9,8 +9,10 @@ define([
     var game;
     var playerManager;
     var gen;
+    var running = 0;
 
     // graphics
+    var vfx;
     var graphics;
     var colorScheme = new Colors();
     var goodColors = colorScheme.getPalette(500);
@@ -60,9 +62,32 @@ define([
         return 1 - Phaser.Math.clamp(res / max, 0, 1);
     }
 
-    var Level = function (g, pm) {
+    function start() {
+        vfx.gameFadeIn(function () {
+            running = 1;
+            playerManager.setupPlayer();
+            playerManager.on('move', function () {
+                moving = true;
+            });
+            playerManager.on('stop', function () {
+                moving = false;
+            });
+        });
+    }
+
+    function stop() {
+        running = 0;
+        playerManager.clearPlayer();
+        playerManager.off();
+        vfx.gameFadeOut(function () {
+            game.state.restart(true, false, curr+1);
+        });
+    }
+
+    var Level = function (g, pm, v) {
         game = g;
         playerManager = pm;
+        vfx = v;
         bbox = {xl: 0, xr: game.width, yt: 0, yb: game.height};
         idStyle = { font: '65px Arial', fill: '#000000', align: 'center' };
 
@@ -84,14 +109,6 @@ define([
 
     Level.prototype.create = function () {
         graphics.clear();
-
-        playerManager.setupPlayer();
-        playerManager.on('move', function () {
-            moving = true;
-        });
-        playerManager.on('stop', function () {
-            moving = false;
-        });
 
         for (var i = 1; i <= nbLevels; i++) {
             var data = game.cache.getJSON('lvl'+i);
@@ -119,10 +136,14 @@ define([
     Level.prototype.init = function (lvl) {
         curr = lvl || 1;
         playerManager.clearPlayer();
-        game.world.alpha = 1;
+
+        start();
     };
 
     Level.prototype.update = function () {
+        if (!running) {
+            return;
+        }
         if (moving) {
             moved += game.time.elapsed;
             move(moved);
@@ -132,7 +153,7 @@ define([
             progress = score(lvls[curr].sites_start, lvls[curr].sites, lvls[curr].sites_end);
 
             if (progress > 0.99) {
-                game.state.restart(true, false, curr+1);
+                stop();
             }
         }
     };
