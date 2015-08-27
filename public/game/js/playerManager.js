@@ -1,51 +1,66 @@
 'use strict';
 
-define([
-
-], function () {
+define([], function () {
 
     var game;
-    var player;
+    var players;
 
     var events = {};
 
     var PlayerManager = function (g) {
         game = g;
+        players = {};
     };
 
     PlayerManager.prototype.add = function(netPlayer) {
-        player = netPlayer;
+        if (_.keys(players).length >= 2) {
+            netPlayer.send('kicked');
+            return;
+        }
 
-        // handle the disconnect event
-        player.on('disconnect', function () {
+        players[netPlayer.id] = netPlayer;
+
+        netPlayer.on('disconnect', function () {
             console.log('PLAYER DISCONNECTED', netPlayer.id);
-            if (!player) return;
-            player.off();
+            var p = players[netPlayer.id];
+            if (!p) return;
+            p.off();
+            delete players[netPlayer.id];
+
+            if (events.leavePlayer) {
+                events.leavePlayer(_.keys(players).length);
+            }
         });
 
-        if (events.first) {
-            events.first();
+        if (events.newPlayer) {
+            events.newPlayer(_.keys(players).length);
         }
     };
 
-    PlayerManager.prototype.setupPlayer = function (done) {
-        player.off();
-        player.on('move', function () {
-            if (events.move) {
-                events.move();
-            }
+    PlayerManager.prototype.setupPlayers = function () {
+        _.valuesIn(players).forEach(function (p, i) {
+            p.off();
+            p.on('move', function () {
+                if (events.move) {
+                    events.move(i);
+                }
+            });
+            p.on('stop', function () {
+                if (events.stop) {
+                    events.stop(i);
+                }
+            });
         });
-        player.on('stop', function () {
-            if (events.stop) {
-                events.stop();
-            }
-        });
-        if (done) done();
     };
 
-    PlayerManager.prototype.clearPlayer = function (done) {
-        player.off();
-        if (done) done();
+    PlayerManager.prototype.clearPlayers = function () {
+        _.valuesIn(players).forEach(function (p, i) {
+            p.off();
+        });
+    };
+
+    PlayerManager.prototype.getNumberPlayers = function () {
+        return _.keys(players).length;
     };
 
     PlayerManager.prototype.on = function (event, cb) {

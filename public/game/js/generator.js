@@ -20,7 +20,7 @@ define([
         var w = params.width;
         var h = params.height;
         var sw = params.width / n;
-        var sh = params.height/ n;
+        var sh = params.height / n;
         var sites_start = [];
         var sites_end = [];
 
@@ -33,8 +33,11 @@ define([
                 sites_end.push(end);
             }
         }
-        var sites = sites_start.map(function (p) {
-            return p.clone();
+        var sites = sites_start.map(function (p, i) {
+            var copy = p.clone();
+            copy.owner = (i < sites_start.length/2) ? 0 : 1;
+            Phaser.Point.interpolate(sites_start[i], sites_end[i], copy.owner * 0.5, copy);
+            return copy;
         });
 
         return {

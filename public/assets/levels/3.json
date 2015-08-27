@@ -1,4 +1,5 @@
 {
     "points": 3,
-    "players": 2
+    "speed1": 0.6,
+    "speed2": 0.45
 }

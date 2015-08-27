@@ -18,9 +18,10 @@ define([
     var goodColors = colorScheme.getPalette(500);
     var badColors = colorScheme.getPalette(0);
     var STEPS = 100;
+    var flasher;
 
     // levels
-    var nbLevels = 3;
+    var nbLevels = 4;
     var progress;
     var lvls;
     var curr;
@@ -29,24 +30,25 @@ define([
     var voronoi = new Voronoi();
     var bbox;
     var moving;
+    var speeds;
+    var moved;
     var diagram;
 
-    // time
-    var lastTime;
-    var moved;
-
-    // gameID text
-    var idStyle;
-    var text;
-
     function easingFun(t) {
-        return (Math.sin(t)+1)/2;
+        // return (Math.cos(t + Math.PI) + 1) / 2;
+        return Math.abs(Math.sin(t));
     }
 
-    function move (moved) {
-        var ts = moved / 1000;
+    function move() {
         lvls[curr].sites.forEach(function (s, i) {
-            Phaser.Point.interpolate(lvls[curr].sites_start[i], lvls[curr].sites_end[i], easingFun(ts*lvls[curr].speed), s);
+            if (moving[s.owner]) {
+                Phaser.Point.interpolate(
+                    lvls[curr].sites_start[i],
+                    lvls[curr].sites_end[i],
+                    easingFun(moved[s.owner]/1000*speeds[s.owner]),
+                    s
+                );
+            }
         });
     }
 
@@ -65,19 +67,19 @@ define([
     function start() {
         vfx.gameFadeIn(function () {
             running = 1;
-            playerManager.setupPlayer();
-            playerManager.on('move', function () {
-                moving = true;
+            playerManager.setupPlayers();
+            playerManager.on('move', function (p) {
+                moving[p] = true;
             });
-            playerManager.on('stop', function () {
-                moving = false;
+            playerManager.on('stop', function (p) {
+                moving[p] = false;
             });
         });
     }
 
     function stop() {
         running = 0;
-        playerManager.clearPlayer();
+        playerManager.clearPlayers();
         playerManager.off();
         vfx.gameFadeOut(function () {
             game.state.restart(true, false, curr+1);
@@ -89,7 +91,6 @@ define([
         playerManager = pm;
         vfx = v;
         bbox = {xl: 0, xr: game.width, yt: 0, yb: game.height};
-        idStyle = { font: '65px Arial', fill: '#000000', align: 'center' };
 
         lvls = {};
         curr = 1;
@@ -99,8 +100,6 @@ define([
 
     Level.prototype.preload = function () {
         graphics = game.add.graphics(0, 0);
-        text = game.add.text(50, 50, game.gameID, idStyle);
-        text.anchor.set(0.5);
 
         for (var i = 1; i <= nbLevels; i++) {
             game.load.json('lvl'+i, '../../assets/levels/' + i + '.json');
@@ -119,12 +118,12 @@ define([
                 players: data.players,
                 nb: data.points
             });
-            lvls[i].speed = data.speed || 0.25;
+            speeds = [data.speed1 || 0.25, data.speed2 || 0.25];
         }
 
         progress = 0;
-        moving = false;
-        moved = 0;
+        moving = [false, false];
+        moved = [0, 0];
 
         voronoi.recycle(diagram);
         diagram = voronoi.compute(lvls[curr].sites, bbox);
@@ -135,8 +134,7 @@ define([
 
     Level.prototype.init = function (lvl) {
         curr = lvl || 1;
-        playerManager.clearPlayer();
-
+        playerManager.clearPlayers();
         start();
     };
 
@@ -144,12 +142,12 @@ define([
         if (!running) {
             return;
         }
-        if (moving) {
-            moved += game.time.elapsed;
-            move(moved);
+        if (moving[0] || moving[1]) {
+            moved[0] += moving[0] ? game.time.elapsed : 0;
+            moved[1] += moving[1] ? game.time.elapsed : 0;
+            move();
             voronoi.recycle(diagram);
             diagram = voronoi.compute(lvls[curr].sites, bbox);
-            lastTime = game.time.now;
             progress = score(lvls[curr].sites_start, lvls[curr].sites, lvls[curr].sites_end);
 
             if (progress > 0.99) {
@@ -181,10 +179,6 @@ define([
     		}
             graphics.endFill();
         });
-    };
-
-    Level.prototype.shutdown = function () {
-        playerManager.clearPlayer();
     };
 
     return Level;

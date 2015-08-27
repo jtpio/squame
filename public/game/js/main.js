@@ -3,59 +3,42 @@
 requirejs([
     './playerManager',
     './networkManager',
+    './connect',
     './level',
     './vfx'
-], function (PlayerManager, NetworkManager, Level, Vfx) {
+], function (PlayerManager, NetworkManager, Connect, Level, Vfx) {
 
     var W = 1024;
     var H = 576;
-    var game;
-    var vfx;
 
-    var url;
-    var urlStyle = { font: '35px Arial', fill: '#ffffff', align: 'center' };
+    var game;
 
     function buildURL(id) {
         var split = window.location.href.split('/');
         var root = split[2];
-        url = root + '/player/?g='+id;
-        return 'http://' + url;
-    }
-
-    function preload() {
-        url = game.add.text(game.world.centerX, game.world.centerY, '', urlStyle);
-        url.anchor.set(0.5);
+        return 'http://' + root + '/player/?g='+id;
     }
 
     function create() {
         game.time.advancedTiming = true;
         game.stage.disableVisibilityChange = true;
 
-        vfx = new Vfx(game);
-
+        var vfx = new Vfx(game);
         var playerManager = new PlayerManager(game);
         var networkManager = new NetworkManager(game, playerManager);
+        var connect = new Connect(game, playerManager, vfx);
         var level = new Level(game, playerManager, vfx);
 
+        game.state.add('Connect', connect);
         game.state.add('Level', level);
 
-        playerManager.on('first', transition);
-
         networkManager.setupServer(function (gameID) {
-            url.text = buildURL(gameID);
-        });
-    }
-
-    function transition() {
-        vfx.gameFadeOut(function () {
-            game.state.start('Level');
+            game.url = buildURL(gameID);
+            game.state.start('Connect');
         });
     }
 
     game = new Phaser.Game(W, H, Phaser.WEBGL, 'game-container', {
-        preload: preload,
         create: create
     });
-
-
 });

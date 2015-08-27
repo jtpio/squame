@@ -1,16 +1,4 @@
-@font-face {
-    font-family: pixelArt;
-    src: url('res/pixelart.ttf') format('truetype');
-}
-
-#logo{
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 10000;
-}
-
-body, html{
+body, html {
 	margin: 0;
 	padding: 0;
 	background: #000000;
@@ -24,29 +12,4 @@ body, html{
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
-}
-
-.flip-clock-wrapper{
-	font-family: pixelArt;
-	position: absolute;
-	z-index: 300;
-	top: 50%;
-  transform: translateY(-50%);
-}
-
-.flip-clock-wrapper ul{
-	height: 75px;
-}
-
-.flip-clock-wrapper ul .flip-clock-active{
-	background: transparent;
-}
-
-.flip-clock-wrapper ul li a div.up div.inn,
-.flip-clock-wrapper ul li a div.down div.inn,
-.flip-clock-wrapper .flip-clock-dot{
-	background: #776A29;
-}
-.flip-clock-wrapper .flip-clock-label{
-	display: none;
 }
