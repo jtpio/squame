@@ -12,9 +12,17 @@ define([], function () {
 
     var flashTimeout;
 
-    function transition(state) {
+    function transition() {
+        setTimeout(function () {
+            vfx.gameFadeOut(function () {
+                game.state.start('Level', true, false);
+            });
+        }, 2000);
+    }
+
+    function reinit() {
         vfx.gameFadeOut(function () {
-            game.state.start(state);
+            game.state.start('Connect', true, false);
         });
     }
 
@@ -28,10 +36,10 @@ define([], function () {
         vfx.displayPlayers();
 
         playerManager.on('newPlayer', function (total) {
-            if (total === 2) { transition('Level'); }
+            if (total === 2) { transition(); }
         });
         playerManager.on('leavePlayer', function (total) {
-            if (total < 2) { transition('Connect'); }
+            if (total < 2) { reinit(); }
         });
 
         url = game.add.text(game.world.centerX, game.world.centerY, game.url, urlStyle);
@@ -41,6 +49,8 @@ define([], function () {
             vfx.flash();
             flashTimeout = setTimeout(flash, game.rnd.between(1000, 3000));
         })();
+
+        vfx.gameFadeIn();
     };
 
     Connect.prototype.render = function () {

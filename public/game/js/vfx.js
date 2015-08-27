@@ -32,30 +32,18 @@ define([
     Vfx.prototype.flash = function () {
         squares.forEach(function (s) {
             game.add.tween(s)
-                .to({ alpha: 0 }, 500, Phaser.Easing.Bounce.Out, true, 0)
-                .yoyo(1)
-                .delay(game.rnd.between(1500, 3000));
+                .from({ alpha: 1})
+                .to({ alpha: 0 }, 500, Phaser.Easing.Bounce.Out, true, game.rnd.between(1500, 3000), 0, true);
         });
     };
 
     Vfx.prototype.displayPlayers = function () {
         squares = [game.add.graphics(0,0), game.add.graphics(0,0)];
-        colors = [0xff1400, 0xcfff00];
-
-        var w1 = game.rnd.between(0.10*game.height, 0.25*game.height);
-        var w2 = game.rnd.between(0.10*game.height, 0.25*game.height);
+        colors = [0xff1400, 0x75b300];
 
         players = [
-            new Phaser.Rectangle(
-                game.rnd.between(0.10*game.width, 0.75*game.width),
-                game.rnd.between(0.10*game.height, 0.25*game.height),
-                w1, w1
-            ),
-            new Phaser.Rectangle(
-                game.rnd.between(0.25*game.width, 0.75*game.width),
-                game.rnd.between(0.5*game.height, 0.75*game.height),
-                w2, w2
-            )
+            new Phaser.Rectangle(0, 0, game.width, 0.5*game.height),
+            new Phaser.Rectangle(0, 0.5*game.height, game.width, 0.5*game.height)
         ];
     };
 
@@ -66,8 +54,8 @@ define([
 
         for (var i = 0; i < n; i++) {
             var p = players[i];
-            squares[i].lineStyle(1, 0xffffff, 1);
-            squares[i].beginFill(colors[i]);
+            squares[i].lineStyle(40, 0x000000, 1);
+            squares[i].beginFill(colors[Math.max(i,n-1)]);
             squares[i].drawRect(p.x, p.y, p.width, p.height);
             squares[i].endFill();
         }

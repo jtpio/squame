@@ -169,7 +169,7 @@ define([
             var len = halfedges.length;
             if (len === 0) return;
             var v = halfedges[0].getStartpoint();
-            graphics.lineStyle(5, 0x000000, 1);
+            graphics.lineStyle(10, 0x000000, 1);
             var mainColor = Phaser.Color.interpolateColor(badColors[site.colorId], goodColors[site.colorId], STEPS, progress * STEPS, 1);
             graphics.beginFill(mainColor);
     		graphics.moveTo(v.x,v.y);

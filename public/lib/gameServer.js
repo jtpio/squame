@@ -20,7 +20,7 @@
     sendEvent('newPlayer', [players[id]]);
   }
 
-  function removePlayer  (msg) {
+  function removePlayer (msg) {
     var id = msg.playerID;
     var player = players[id];
     if (!player) return;

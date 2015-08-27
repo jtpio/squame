@@ -39,7 +39,8 @@ define([], function () {
 
     PlayerManager.prototype.setupPlayers = function () {
         _.valuesIn(players).forEach(function (p, i) {
-            p.off();
+            p.off('move');
+            p.off('stop');
             p.on('move', function () {
                 if (events.move) {
                     events.move(i);
@@ -55,7 +56,8 @@ define([], function () {
 
     PlayerManager.prototype.clearPlayers = function () {
         _.valuesIn(players).forEach(function (p, i) {
-            p.off();
+            p.off('move');
+            p.off('stop');
         });
     };
 
