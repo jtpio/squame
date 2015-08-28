@@ -18,7 +18,9 @@ define([
     var goodColors = colorScheme.getPalette(500);
     var badColors = colorScheme.getPalette(0);
     var STEPS = 100;
-    var flasher;
+
+    // sound
+    var winSound;
 
     // levels
     var nbLevels = 4;
@@ -78,6 +80,7 @@ define([
     }
 
     function stop() {
+        winSound.play();
         running = 0;
         playerManager.clearPlayers();
         playerManager.off();
@@ -100,6 +103,7 @@ define([
 
     Level.prototype.preload = function () {
         graphics = game.add.graphics(0, 0);
+        game.load.audio('win', ['../../assets/sounds/Jingle_Achievement_00.wav']);
 
         for (var i = 1; i <= nbLevels; i++) {
             game.load.json('lvl'+i, '../../assets/levels/' + i + '.json');
@@ -107,6 +111,8 @@ define([
     };
 
     Level.prototype.create = function () {
+        winSound = game.add.audio('win');
+
         graphics.clear();
 
         for (var i = 1; i <= nbLevels; i++) {
@@ -134,6 +140,9 @@ define([
 
     Level.prototype.init = function (lvl) {
         curr = lvl || 1;
+        if (curr > nbLevels) {
+            return game.state.start('End', true, false);
+        }
         playerManager.clearPlayers();
         start();
     };

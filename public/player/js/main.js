@@ -18,7 +18,7 @@ requirejs([
     networkManager.setupClient();
 
     function preload () {
-        txt = game.add.text(game.world.centerX, game.world.centerY, 'Press to Move', txtStyle);
+        txt = game.add.text(game.world.centerX, game.world.centerY, 'Look Up\nand\nPress to Move', txtStyle);
         txt.anchor.set(0.5);
     }
 

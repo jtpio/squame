@@ -5,8 +5,9 @@ requirejs([
     './networkManager',
     './connect',
     './level',
+    './end',
     './vfx'
-], function (PlayerManager, NetworkManager, Connect, Level, Vfx) {
+], function (PlayerManager, NetworkManager, Connect, Level, End, Vfx) {
 
     var W = 1024;
     var H = 576;
@@ -26,11 +27,15 @@ requirejs([
         var vfx = new Vfx(game);
         var playerManager = new PlayerManager(game);
         var networkManager = new NetworkManager(game, playerManager);
+
+        // states
         var connect = new Connect(game, playerManager, vfx);
         var level = new Level(game, playerManager, vfx);
+        var end = new End(game, vfx);
 
         game.state.add('Connect', connect);
         game.state.add('Level', level);
+        game.state.add('End', end);
 
         networkManager.setupServer(function (gameID) {
             game.url = buildURL(gameID);

@@ -29,11 +29,16 @@ define([
         return fade(1, cb);
     };
 
-    Vfx.prototype.flash = function () {
-        squares.forEach(function (s) {
+    Vfx.prototype.flash = function (sounds, n) {
+        squares.forEach(function (s, i) {
             game.add.tween(s)
                 .from({ alpha: 1})
-                .to({ alpha: 0 }, 500, Phaser.Easing.Bounce.Out, true, game.rnd.between(1500, 3000), 0, true);
+                .to({ alpha: 0 }, 500, Phaser.Easing.Bounce.Out, true, game.rnd.between(1500, 3000), 0, true)
+                .onStart.add(function () {
+                    if (i < n) {
+                        sounds[i].play();
+                    }
+                });
         });
     };
 
