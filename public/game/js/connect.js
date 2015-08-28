@@ -43,7 +43,6 @@ define([], function () {
 
         vfx.displayPlayers();
 
-
         url = game.add.text(game.world.centerX, game.world.centerY, game.url, urlStyle);
         url.anchor.set(0.5);
 
