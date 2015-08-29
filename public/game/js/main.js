@@ -17,7 +17,7 @@ requirejs([
     function buildURL(id) {
         var split = window.location.href.split('/');
         var root = split[2];
-        return root + '/player/?g='+id;
+        return root + '/p/?g='+id;
     }
 
     function create() {
