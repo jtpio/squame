@@ -21,7 +21,6 @@ requirejs([
     }
 
     function create() {
-        game.time.advancedTiming = true;
         game.stage.disableVisibilityChange = true;
 
         var vfx = new Vfx(game);
