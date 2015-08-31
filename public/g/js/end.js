@@ -7,7 +7,7 @@ define([], function () {
 
     var text;
     var textStyle = { font: '35px Arial', fill: '#ffffff', align: 'center' };
-    var fullText = 'Squame\n\nby @jtpio\n\n squame.jtp.io/game';
+    var fullText = 'Squame\n\nby @jtpio\n\n squame.jtp.io/g';
 
     function End(g, v) {
         game = g;
