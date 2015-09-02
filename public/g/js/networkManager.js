@@ -17,7 +17,7 @@ define([
         server = new GameServer('server');
 
         server.on('gameID', function (gameID) {
-            console.log('ready', gameID);
+            console.log('Received game ID', gameID);
             game.gameID = gameID;
 
             server.on('newPlayer', function (player) {
