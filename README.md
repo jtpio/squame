@@ -3,6 +3,7 @@ Squame
 
 Squame is a tech demo using the minimalist networking framework [jammer](https://github.com/jtpio/jammer).
 
+![Screenshot](https://raw.githubusercontent.com/jtpio/squame/master/public/assets/screenshot.png)
 
 ## Play
 
