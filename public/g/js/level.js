@@ -123,6 +123,8 @@ define([
             });
 
             running = 1;
+            progress = 0;
+
         });
     }
 
