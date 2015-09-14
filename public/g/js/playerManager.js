@@ -13,11 +13,6 @@ define([], function () {
     };
 
     PlayerManager.prototype.add = function(netPlayer) {
-        if (_.keys(players).length >= 2) {
-            netPlayer.send('kicked');
-            return;
-        }
-
         players[netPlayer.id] = netPlayer;
 
         netPlayer.on('disconnect', function () {
@@ -28,36 +23,48 @@ define([], function () {
             delete players[netPlayer.id];
 
             if (events.leavePlayer) {
-                events.leavePlayer(_.keys(players).length);
+                events.leavePlayer(netPlayer);
             }
         });
 
         if (events.newPlayer) {
-            events.newPlayer(_.keys(players).length);
+            events.newPlayer(netPlayer);
         }
+
+        this.setupListeners(netPlayer);
+    };
+
+    PlayerManager.prototype.setupListeners = function (p) {
+        p.off('move');
+        p.off('stop');
+        p.on('move', function () {
+            if (events.move) {
+                events.move(p);
+            }
+        });
+        p.on('switch', function () {
+            if (events.switch) {
+                events.switch(p);
+            }
+        });
+        p.on('stop', function () {
+            if (events.stop) {
+                events.stop(p);
+            }
+        });
     };
 
     PlayerManager.prototype.setupPlayers = function () {
-        _.valuesIn(players).forEach(function (p, i) {
-            p.off('move');
-            p.off('stop');
-            p.on('move', function () {
-                if (events.move) {
-                    events.move(i);
-                }
-            });
-            p.on('stop', function () {
-                if (events.stop) {
-                    events.stop(i);
-                }
-            });
-        });
+        _.valuesIn(players).forEach(function (p) {
+            this.setupListeners(p);
+        }.bind(this));
     };
 
     PlayerManager.prototype.clearPlayers = function () {
         _.valuesIn(players).forEach(function (p, i) {
             p.off('move');
             p.off('stop');
+            p.off('switch');
         });
     };
 
@@ -75,6 +82,10 @@ define([], function () {
         } else {
             events = {};
         }
+    };
+
+    PlayerManager.prototype.getPlayers = function () {
+        return players;
     };
 
     return PlayerManager;

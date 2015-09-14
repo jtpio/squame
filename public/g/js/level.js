@@ -15,8 +15,7 @@ define([
     var vfx;
     var graphics;
     var colorScheme = new Colors();
-    var goodColors = colorScheme.getPalette(500);
-    var badColors = colorScheme.getPalette(0);
+    var pairs = _.shuffle(colorScheme.getPairs(100));
     var STEPS = 100;
 
     // sound
@@ -32,25 +31,16 @@ define([
     var voronoi = new Voronoi();
     var bbox;
     var moving;
-    var speeds;
-    var moved;
     var diagram;
-
-    function easingFun(t) {
-        // return (Math.cos(t + Math.PI) + 1) / 2;
-        return Math.abs(Math.sin(t));
-    }
 
     function move() {
         lvls[curr].sites.forEach(function (s, i) {
-            if (moving[s.owner]) {
-                Phaser.Point.interpolate(
-                    lvls[curr].sites_start[i],
-                    lvls[curr].sites_end[i],
-                    easingFun(moved[s.owner]/1000*speeds[s.owner]),
-                    s
-                );
-            }
+            Phaser.Point.interpolate(
+                lvls[curr].sites_start[i],
+                lvls[curr].sites_end[i],
+                gen.easingFun(s.moved/1000),
+                s
+            );
         });
     }
 
@@ -66,16 +56,72 @@ define([
         return 1 - Phaser.Math.clamp(res / max, 0, 1);
     }
 
+    function findAndAssignSite(p) {
+        var n = lvls[curr].sites.length;
+        var available;
+        for (var i = 0; i < n; i++) {
+            var m = ((p.site || 0) + i) % n;
+            var s = lvls[curr].sites[m];
+            if (s && !s.hasOwnProperty('owner')) {
+                available = s;
+                break;
+            }
+        }
+        if (available) {
+            // clear previous ownership first
+            if (p.hasOwnProperty('site') && lvls[curr].sites[p.site]) {
+                delete lvls[curr].sites[p.site].owner;
+                delete p.site;
+            }
+            // assign new ownership
+            available.owner = p.id;
+            p.site = _.indexOf(lvls[curr].sites, available);
+            p.send('color', pairs[available.colorId][0]);
+        }
+    }
+
     function start() {
         vfx.gameFadeIn(function () {
-            running = 1;
             playerManager.setupPlayers();
             playerManager.on('move', function (p) {
-                moving[p] = true;
+                if (!running) { return; }
+                moving[p.id] = true;
             });
             playerManager.on('stop', function (p) {
-                moving[p] = false;
+                if (!running) { return; }
+                moving[p.id] = false;
             });
+            playerManager.on('switch', function (p) {
+                if (!running) { return; }
+                findAndAssignSite(p);
+            });
+            playerManager.on('newPlayer', function (p) {
+                if (!running) { return; }
+                findAndAssignSite(p);
+            });
+            playerManager.on('leavePlayer', function (p) {
+                if (!running) { return; }
+
+                if (p.hasOwnProperty('site') && lvls[curr].sites[p.site]) {
+                    delete lvls[curr].sites[p.site].owner;
+                    delete p.site;
+                }
+            });
+
+            // at startup, assign one site per player
+            var players = playerManager.getPlayers();
+            Object.keys(players).forEach(function (playerId, i) {
+                var p = players[playerId];
+                lvls[curr].sites[i].owner = p.id;
+                p.site = i;
+            });
+
+            lvls[curr].sites.forEach(function (s, i) {
+                s.colorId = i;
+                s.phase = Math.random() * Math.PI * 0.5;
+            });
+
+            running = 1;
         });
     }
 
@@ -102,7 +148,12 @@ define([
     };
 
     Level.prototype.preload = function () {
+        var skipKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
+        skipKey.onUp.add(function () {
+            stop();
+        });
         graphics = game.add.graphics(0, 0);
+
         game.load.audio('win', ['../../assets/sounds/Jingle_Achievement_00.wav']);
 
         for (var i = 1; i <= nbLevels; i++) {
@@ -124,18 +175,13 @@ define([
                 players: data.players,
                 nb: data.points
             });
-            speeds = [data.speed1 || 0.25, data.speed2 || 0.25];
         }
 
         progress = 0;
-        moving = [false, false];
-        moved = [0, 0];
+        moving = {};
 
         voronoi.recycle(diagram);
         diagram = voronoi.compute(lvls[curr].sites, bbox);
-        diagram.cells.forEach(function (c, i) {
-            c.site.colorId = i % badColors.length;
-        });
     };
 
     Level.prototype.init = function (lvl) {
@@ -151,9 +197,20 @@ define([
         if (!running) {
             return;
         }
-        if (moving[0] || moving[1]) {
-            moved[0] += moving[0] ? game.time.elapsed : 0;
-            moved[1] += moving[1] ? game.time.elapsed : 0;
+
+        var players = playerManager.getPlayers();
+        var hasMoved = false;
+
+        for (var p in players) {
+            var player = players[p];
+            if (!lvls[curr].sites[player.site]) {
+                continue;
+            }
+            lvls[curr].sites[player.site].moved += moving[player.id] ? game.time.elapsed : 0;
+            hasMoved = hasMoved || moving[player.id];
+        }
+        // if movement
+        if (hasMoved) {
             move();
             voronoi.recycle(diagram);
             diagram = voronoi.compute(lvls[curr].sites, bbox);
@@ -171,14 +228,19 @@ define([
         }
         var cells = diagram.cells;
         graphics.clear();
-        cells.forEach(function (c) {
-            var site = c.site;
+        lvls[curr].sites.forEach(function (s) {
+            // lookup the correct cell
+            var c = cells[s.voronoiId];
             var halfedges = c.halfedges;
             var len = halfedges.length;
             if (len === 0) return;
             var v = halfedges[0].getStartpoint();
             graphics.lineStyle(10, 0x000000, 1);
-            var mainColor = Phaser.Color.interpolateColor(badColors[site.colorId], goodColors[site.colorId], STEPS, progress * STEPS, 1);
+            var mainColor = s.hasOwnProperty('owner') ?
+                Phaser.Color.interpolateColor(
+                    pairs[s.colorId][0], pairs[s.colorId][2],
+                    STEPS, Math.abs(Math.sin(Date.now() / 1000 + s.phase)) * STEPS, 1)
+                : 0xffffff;
             graphics.beginFill(mainColor);
     		graphics.moveTo(v.x,v.y);
     		for (var i = 0; i < len; i++) {

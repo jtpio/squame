@@ -11,29 +11,44 @@ requirejs([
         create: create
     }, false, false);
 
-    var txtStyle = { font: '35px Arial', fill: '#ffffff', align: 'center' };
-    var txt;
+    var moveTxtStyle = { font: '60px Arial', fill: '#ffffff', align: 'center' };
+    var moveTxt;
+    var switchTxt;
+    var switchTxtStyle = { font: '60px Arial', fill: '#ffffff', align: 'center' };
 
     var networkManager = new NetworkManager(game);
     networkManager.setupClient();
 
     function preload () {
-        txt = game.add.text(game.world.centerX, game.world.centerY, 'Look Up\nand\nPress to Move', txtStyle);
-        txt.anchor.set(0.5);
+        moveTxt = game.add.text(game.world.centerX, game.world.centerY * 0.5, 'Move', moveTxtStyle);
+        moveTxt.anchor.set(0.5);
+        moveTxt.inputEnabled = true;
+        switchTxt = game.add.text(game.world.centerX, game.world.centerY * 1.5, 'Switch', switchTxtStyle);
+        switchTxt.anchor.set(0.5);
+        switchTxt.inputEnabled = true;
     }
 
     function create () {
         game.stage.disableVisibilityChange = true;
         game.stage.backgroundColor = '#000000';
 
-        game.input.onDown.add(function () {
+        moveTxt.events.onInputDown.add(function () {
             networkManager.getClient().send('move');
-            txt.text = 'Release to Stop';
+            moveTxt.text = 'Stop';
         });
 
-        game.input.onUp.add(function () {
+        moveTxt.events.onInputUp.add(function () {
             networkManager.getClient().send('stop');
-            txt.text = 'Press to Move';
+            moveTxt.text = 'Move';
+        });
+
+        switchTxt.events.onInputUp.add(function () {
+            console.log('sending event switch');
+            networkManager.getClient().send('switch');
+        });
+
+        networkManager.getClient().on('color', function (color) {
+            switchTxt.fill = '#' + color.substring(2);
         });
 
     }

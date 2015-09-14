@@ -23,12 +23,14 @@ define([
         console.log('Query variable %s not found', variable);
     };
 
-    NetworkManager.prototype.setupClient = function () {
+    NetworkManager.prototype.setupClient = function (joined) {
         client = new GameClient();
 
         client.on('joined', function () {
             console.log('Joined game');
-
+            if (joined) {
+                joined();
+            }
             // client.sendCommand('goto', 'world');
         });
 

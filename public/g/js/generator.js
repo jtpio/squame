@@ -15,6 +15,11 @@ define([
         };
     }
 
+    Generator.prototype.easingFun = function (x) {
+        // return (Math.cos(t + Math.PI) + 1) / 2;
+        return Math.abs(Math.sin(x));
+    };
+
     Generator.prototype.new = function (params) {
         var n = params.nb;
         var w = params.width;
@@ -35,10 +40,10 @@ define([
         }
         var sites = sites_start.map(function (p, i) {
             var copy = p.clone();
-            copy.owner = (i < sites_start.length/2) ? 0 : 1;
-            Phaser.Point.interpolate(sites_start[i], sites_end[i], copy.owner * 0.5, copy);
+            copy.moved = Math.random();
+            Phaser.Point.interpolate(sites_start[i], sites_end[i], this.easingFun(copy.moved), copy);
             return copy;
-        });
+        }.bind(this));
 
         return {
             sites: sites,
