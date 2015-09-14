@@ -37,6 +37,7 @@ define([], function () {
     PlayerManager.prototype.setupListeners = function (p) {
         p.off('move');
         p.off('stop');
+        p.off('switch');
         p.on('move', function () {
             if (events.move) {
                 events.move(p);

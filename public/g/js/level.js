@@ -20,6 +20,7 @@ define([
 
     // sound
     var winSound;
+    var music;
 
     // levels
     var nbLevels = 4;
@@ -38,7 +39,7 @@ define([
             Phaser.Point.interpolate(
                 lvls[curr].sites_start[i],
                 lvls[curr].sites_end[i],
-                gen.easingFun(s.moved/1000),
+                gen.easingFun(s.moved/1000*0.75),
                 s
             );
         });
@@ -154,7 +155,8 @@ define([
         });
         graphics = game.add.graphics(0, 0);
 
-        game.load.audio('win', ['../../assets/sounds/Jingle_Achievement_00.wav']);
+        game.load.audio('music', ['../../assets/sounds/Dream.ogg', '../../assets/sounds/Dream.mp3']);
+        game.load.audio('win', ['../../assets/sounds/Jingle_Achievement_00.ogg', '../../assets/sounds/Jingle_Achievement_00.mp3']);
 
         for (var i = 1; i <= nbLevels; i++) {
             game.load.json('lvl'+i, '../../assets/levels/' + i + '.json');
@@ -163,7 +165,11 @@ define([
 
     Level.prototype.create = function () {
         winSound = game.add.audio('win');
+        music = game.add.audio('music');
 
+        music.volume = 1;
+        music.loop = true;
+        music.play();
         graphics.clear();
 
         for (var i = 1; i <= nbLevels; i++) {
@@ -197,6 +203,8 @@ define([
         if (!running) {
             return;
         }
+
+        music._sound.playbackRate.value = Math.min(progress + 0.1, 1.2);
 
         var players = playerManager.getPlayers();
         var hasMoved = false;
