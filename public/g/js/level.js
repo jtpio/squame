@@ -124,11 +124,13 @@ define([
 
             running = 1;
             progress = 0;
+            music.play();
 
         });
     }
 
     function stop() {
+        music.stop();
         winSound.play();
         running = 0;
         playerManager.clearPlayers();
@@ -157,7 +159,7 @@ define([
         });
         graphics = game.add.graphics(0, 0);
 
-        game.load.audio('music', ['../../assets/sounds/Dream.ogg', '../../assets/sounds/Dream.mp3']);
+        game.load.audio('music', ['../../assets/sounds/loop.ogg', '../../assets/sounds/loop.mp3']);
         game.load.audio('win', ['../../assets/sounds/Jingle_Achievement_00.ogg', '../../assets/sounds/Jingle_Achievement_00.mp3']);
 
         for (var i = 1; i <= nbLevels; i++) {
@@ -171,7 +173,6 @@ define([
 
         music.volume = 1;
         music.loop = true;
-        music.play();
         graphics.clear();
 
         for (var i = 1; i <= nbLevels; i++) {
@@ -206,7 +207,7 @@ define([
             return;
         }
 
-        music._sound.playbackRate.value = Math.min(progress + 0.1, 1.2);
+        music._sound.playbackRate.value = Math.min(progress, 1);
 
         var players = playerManager.getPlayers();
         var hasMoved = false;
