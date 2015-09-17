@@ -17,7 +17,7 @@ define([
 
     Generator.prototype.easingFun = function (x) {
         // return (Math.cos(t + Math.PI) + 1) / 2;
-        return Math.abs(Math.sin(x));
+        return Math.abs(Math.sin(x/1000*0.75));
     };
 
     Generator.prototype.new = function (params) {

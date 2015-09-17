@@ -39,7 +39,7 @@ define([
             Phaser.Point.interpolate(
                 lvls[curr].sites_start[i],
                 lvls[curr].sites_end[i],
-                gen.easingFun(s.moved/1000*0.75),
+                gen.easingFun(s.moved),
                 s
             );
         });
@@ -109,18 +109,19 @@ define([
                 }
             });
 
-            // at startup, assign one site per player
-            var players = playerManager.getPlayers();
-            Object.keys(players).forEach(function (playerId, i) {
-                var p = players[playerId];
-                lvls[curr].sites[i].owner = p.id;
-                p.site = i;
-            });
-
+            // setup all the sites
             lvls[curr].sites.forEach(function (s, i) {
                 s.colorId = i;
                 s.phase = Math.random() * Math.PI * 0.5;
             });
+
+            // at startup, assign one site per player
+            var players = playerManager.getPlayers();
+            Object.keys(players).forEach(function (playerId, i) {
+                var p = players[playerId];
+                findAndAssignSite(p);
+            });
+
 
             running = 1;
             progress = 0;
