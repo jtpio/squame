@@ -246,12 +246,12 @@ define([
             var len = halfedges.length;
             if (len === 0) return;
             var v = halfedges[0].getStartpoint();
-            graphics.lineStyle(10, 0x000000, 1);
+            graphics.lineStyle(10, 0xffffff, 1);
             var mainColor = s.hasOwnProperty('owner') ?
                 Phaser.Color.interpolateColor(
                     pairs[s.colorId][0], pairs[s.colorId][2],
                     STEPS, Math.abs(Math.sin(Date.now() / 1000 + s.phase)) * STEPS, 1)
-                : 0xffffff;
+                : 0x000000;
             graphics.beginFill(mainColor);
     		graphics.moveTo(v.x,v.y);
     		for (var i = 0; i < len; i++) {
