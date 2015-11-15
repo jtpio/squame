@@ -16,7 +16,7 @@ Squame is a tech demo made to present [jammer](https://github.com/jtpio/jammer),
 
 I demoed squame at [Foo Café](//www.foocafe.org) during [DemoDag Malmö](//twitter.com/demodag_malmo):
 
-[![Squame at Foo Café](//img.youtube.com/vi/epVPNmx8NJs/0.jpg)](//www.youtube.com/watch?v=epVPNmx8NJs)
+[![Squame at Foo Café](https://img.youtube.com/vi/epVPNmx8NJs/0.jpg)](https://www.youtube.com/watch?v=epVPNmx8NJs)
 
 ## Credits
 
