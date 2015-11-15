@@ -12,6 +12,12 @@ Squame is a tech demo made to present [jammer](https://github.com/jtpio/jammer),
 2. Two phones visit the URL displayed on the screen ([squame.jtp.io/p/?g=1](http://squame.jtp.io/p/?g=1) for example)
 3. The players on the phones press the screen to solve the puzzles and go through the levels.
 
+## Video
+
+I demoed squame at [Foo Café](//www.foocafe.org) during [DemoDag Malmö](//twitter.com/demodag_malmo):
+
+[![Squame at Foo Café](//img.youtube.com/vi/epVPNmx8NJs/0.jpg)](//www.youtube.com/watch?v=epVPNmx8NJs)
+
 ## Credits
 
 - Sound effects: Sci-Fi and Electric Sound Effects Libraries, by [Little Robot Sound Factory](http://www.littlerobotsoundfactory.com/)
